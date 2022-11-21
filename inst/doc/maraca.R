@@ -4,10 +4,12 @@ library(dplyr)
 library(maraca)
 
 ## ----maraca1, eval = TRUE-----------------------------------------------------
-file_path <- system.file("extdata", "hce_scenario_b.csv", package = "maraca")
+library(maraca)
 
-data <- read.csv(file_path, stringsAsFactors = FALSE)
-colnames(data)
+data(hce_scenario_a, package = "maraca")
+
+data <- hce_scenario_a
+head(data)
 
 ## ----maraca2, eval = TRUE-----------------------------------------------------
 column_names <- c(
@@ -50,9 +52,9 @@ plot(mar, continuous_grid_spacing_x = 20, density_plot_type = "scatter", vline_t
 
 ## ----maraca11, eval = TRUE, fig.width = 7, fig.height = 6, message=FALSE, warning=FALSE----
 p <- plot_maraca(mar, continuous_grid_spacing_x = 20, density_plot_type = "scatter", vline_type = "mean")
-p +
-  theme_bw() + 
-  theme(axis.text.x.bottom = element_text(angle = 90, vjust = 0.5, hjust = 0.5))
+p + 
+  theme_bw() + scale_color_manual(values=c("#999999", "#E69F00")) + 
+  theme(axis.text.x.bottom = element_text(vjust = 0.5, hjust = 0.5))
 
 ## ----maraca12, eval = TRUE, fig.width = 7, fig.height = 6, message=FALSE, warning=FALSE----
 plot_tte_components(mar)

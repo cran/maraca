@@ -155,6 +155,8 @@ plot_maraca <- function(
     density_plot_type = "default",
     vline_type = "median") {
   checkmate::assert_class(obj, "maraca")
+  checkmate::assert_int(continuous_grid_spacing_x)
+  checkmate::assert_string(trans)
   checkmate::assert_choice(
     density_plot_type, c("default", "violin", "box", "scatter")
   )
@@ -162,6 +164,7 @@ plot_maraca <- function(
     vline_type, c("median", "mean", "none")
   )
   aes <- ggplot2::aes
+  `%>%` <- dplyr::`%>%`
 
   meta <- obj$meta
   continuous <- obj$continuous
@@ -169,6 +172,27 @@ plot_maraca <- function(
   win_odds <- obj$win_odds
   start_continuous_endpoint <- meta[
     meta$outcome == obj$continuous_outcome, ]$startx
+
+  plotdata_surv <- survmod$data[, c("outcome", "strata",
+                                    "adjusted.time", "km.y")]
+  plotdata_surv$type <- "tte"
+  names(plotdata_surv) <- c("outcome", "arm", "x", "y", "type")
+  plotdata_cont <- continuous$data[, c("outcome", "arm", "x", "violiny")]
+  plotdata_cont$type <- "cont"
+  names(plotdata_cont) <- c("outcome", "arm", "x", "y", "type")
+  plotdata <- as.data.frame(rbind(plotdata_surv, plotdata_cont))
+
+  # Add points at (0, 0) on both curves so that they start from the origin
+  add_points <- plotdata %>%
+    dplyr::group_by(arm) %>%
+    dplyr::slice_head(n = 1)
+
+  add_points$x <- 0
+  add_points$y <- 0
+  plotdata <- rbind(
+    add_points,
+    plotdata
+  )
 
   scale <- sign(log10(continuous_grid_spacing_x)) * floor(
     abs(log10(continuous_grid_spacing_x))
@@ -184,7 +208,7 @@ plot_maraca <- function(
     max(continuous$data$value, na.rm = TRUE)
   )
   # Plot the information in the Maraca plot
-  plot <- ggplot2::ggplot(survmod$data, aes(colour = arm)) +
+  plot <- ggplot2::ggplot(plotdata) +
     ggplot2::geom_vline(
       xintercept = cumsum(c(0, meta$proportion)),
       color = "grey80"
@@ -220,37 +244,43 @@ plot_maraca <- function(
   }
 
   plot <- plot +
-    ggplot2::geom_line(
-      data = continuous$data,
-      aes(x = violinx, y = violiny, color = arm)
-    ) +
     ggplot2::geom_step(
-      data = survmod$data,
-      aes(x = adjusted.time, y = km.y * 100, color = strata)
+    data = plotdata[plotdata$type == "tte", ],
+      aes(x = x, y = y, color = arm)
     )
 
   plot <- plot +
     ggplot2::scale_color_discrete("Arm", labels = obj$arm_levels)
 
-  if (density_plot_type == "default" || density_plot_type == "violin") {
+  if (density_plot_type == "default") {
     plot <- plot +
       ggplot2::geom_violin(
-        data = continuous$data,
-        aes(x = x, y = violiny, fill = factor(violiny)), alpha = 0.5
+        data = plotdata[plotdata$type == "cont", ],
+        aes(x = x, y = y, colour = arm, fill = arm), alpha = 0.5
       ) + ggplot2::geom_boxplot(
-        data = continuous$data,
-        aes(x = x, y = violiny, fill = factor(violiny)), alpha = 0.5,
-        width = abs(diff(unique(continuous$data$violiny))) / 3
+        data = plotdata[plotdata$type == "cont", ],
+        aes(x = x, y = y, colour = arm, fill = arm), alpha = 0.5,
+        width = abs(diff(as.numeric(unique(
+          plotdata[plotdata$type == "cont", ]$y)))) / 3
+      )
+  } else if (density_plot_type == "violin") {
+    plot <- plot +
+      ggplot2::geom_violin(
+        data = plotdata[plotdata$type == "cont", ],
+        aes(x = x, y = y, colour = arm, fill = arm), alpha = 0.5
       )
   } else if (density_plot_type == "box") {
     plot <- plot +
       ggplot2::geom_boxplot(
-        data = continuous$data,
-        aes(x = x, y = violiny, fill = factor(violiny)), alpha = 0.5
+        data = plotdata[plotdata$type == "cont", ],
+        aes(x = x, y = y, colour = arm, fill = arm), alpha = 0.5
       )
   } else if (density_plot_type == "scatter") {
     plot <- plot +
-      ggplot2::geom_jitter(data = continuous$data, aes(x = x, y = violiny))
+      ggplot2::geom_jitter(
+        data = plotdata[plotdata$type == "cont", ],
+        aes(x = x, y = y, color = arm)
+      )
   }
 
   labels <- lapply(
@@ -473,25 +503,73 @@ plot.maraca <- function(
   print(plot_maraca(
     x, continuous_grid_spacing_x, trans, density_plot_type, vline_type))
 }
+#' Generic function to plot the hce object using plot().
+#'
+#' This will produce the plot_maraca plot.
+#'
+#' @param x an object of S3 class 'hce'
+#' @param \dots not used
+#' @param continuous_grid_spacing_x The spacing of the x grid to use for the
+#'        continuous section of the plot.
+#' @param trans the transformation to apply to the data before plotting.
+#'        The accepted values are the same that ggplot2::scale_x_continuous
+#' @param density_plot_type The type of plot to use to represent the density.
+#'        Accepts "default", "violin", "box" and "scatter".
+#' @param vline_type what the vertical dashed line should represent. Accepts
+#'        "median", "mean", "none".
+#' @param compute_win_odds If TRUE compute the win odds, otherwise (default)
+#'                         don't compute them.
+#' @return Used for side effect. Plots the maraca object.
+#'
+#' @examples
+#' set.seed(31337)
+#' Rates_A <- c(1.72, 1.74, 0.58, 1.5, 1)
+#' Rates_P <- c(2.47, 2.24, 2.9, 4, 6)
+#' HCE <- hce::simHCE(n = 2500, TTE_A = Rates_A, TTE_P = Rates_P,
+#'              CM_A = -3, CM_P = -6, CSD_A = 16, CSD_P = 15, fixedfy = 3)
+#' plot(HCE)
+#'
+#' @export
+plot.hce <- function(x, continuous_grid_spacing_x = 10, trans = "identity",
+                     density_plot_type = "default",
+                     vline_type = "median", compute_win_odds = FALSE, ...) {
+  checkmate::assert_int(continuous_grid_spacing_x)
+  checkmate::assert_string(trans)
+  checkmate::assert_choice(
+    density_plot_type, c("default", "violin", "box", "scatter"))
+  checkmate::assert_choice(
+    vline_type, c("median", "mean", "none")
+  )
+  checkmate::assert_flag(compute_win_odds)
+
+  x <- as.data.frame(x)
+  TTE <- sort(unique(x$GROUP)[unique(x$GROUP) != "C"])
+  hce_test <- maraca(
+    data = x,
+    tte_outcomes = TTE,
+    continuous_outcome = "C",
+    column_names = c(outcome = "GROUP", arm = "TRTP", value = "AVAL0"),
+    arm_levels = c(active = "A", control = "P"),
+    compute_win_odds = compute_win_odds
+  )
+  print(plot_maraca(
+    hce_test, continuous_grid_spacing_x, trans, density_plot_type, vline_type))
+}
 
 ### Private functions
 
 # Computes the win odds from the internal data.
 .compute_win_odds <- function(HCE) {
+  HCE <- base::as.data.frame(HCE)
   HCE <- .with_ordered_column(HCE)
-  grp <- sanon::grp # nolint
-  fit <- sanon::sanon(
-    ordered ~ grp(arm, ref = "control"),
-    data = HCE)
-  CI0 <- stats::confint(fit)$ci
-  CI <- CI0 / (1 - CI0)
-  p <- fit$p
-
-  win_odds <- c(CI, p)
-  names(win_odds) <- c("estimate", "lower", "upper", "p-value")
-
+  fit <- hce::calcWO(x = HCE, AVAL = "ordered", TRTP = "arm", ref = "control")
+  CI <- base::as.numeric(fit[, base::c("WO", "LCL", "UCL")])
+  p <- fit$Pvalue
+  win_odds <- base::c(CI, p)
+  names(win_odds) <- base::c("estimate", "lower", "upper", "p-value")
   return(win_odds)
 }
+
 
 # This function does a bit of dirty magic to distribute the values
 # onto different "floors", each floor being a numeric offset that is higher
@@ -627,7 +705,7 @@ plot.maraca <- function(
         meta[meta$outcome == entry, ]$proportion
   }
 
-  survmod_data <- survmod_data %>% dplyr::mutate(km.y = 1 - surv)
+  survmod_data <- survmod_data %>% dplyr::mutate(km.y = 100 * (1 - surv))
 
   survmod_meta <- survmod_data %>%
     dplyr::group_by(strata, outcome) %>%
@@ -650,6 +728,14 @@ plot.maraca <- function(
   # after we calculated the meta information.
   add_points$adjusted.time <- meta[
     meta$outcome == utils::tail(tte_outcomes, 1), ]$endx
+  survmod_data <- rbind(
+    survmod_data,
+    add_points
+  )
+  # Add one additional point at x=100% to facilitate plotting
+  # the horizontal line through the continuous distribution.
+  # Note also that we add the point after we calculated the meta information.
+  add_points$adjusted.time <- 100
   survmod_data <- rbind(
     survmod_data,
     add_points
@@ -736,14 +822,6 @@ plot.maraca <- function(
     dplyr::group_by(arm) %>%
     dplyr::summarise(n = n(), median = stats::median(x, na.rm = TRUE),
       average = base::mean(x, na.rm = TRUE))
-
-  continuous_data$violinx <- 0
-  continuous_data[continuous_data$arm == "active", ]$violinx <- seq(
-    from = start_continuous_endpoint, to = 100,
-    length.out = continuous_meta$n[continuous_meta$arm == "active"])
-  continuous_data[continuous_data$arm == "control", ]$violinx <- seq(
-    from = start_continuous_endpoint, to = 100,
-    length.out = continuous_meta$n[continuous_meta$arm == "control"])
 
   continuous_data$violiny <- survmod$meta[
     survmod$meta$strata == "active" &
