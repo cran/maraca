@@ -1,9 +1,9 @@
-bb85896b6fb13106e6a00ccfbc221c58 *DESCRIPTION
+a8c012ab8dea1a47e6e97008ef152c01 *DESCRIPTION
 cc8ec07e600ab518dc33d82acceaf889 *NAMESPACE
-3785bea935cee578137f77f47ac71683 *NEWS.md
+30b4dc80da9f93c7ebb52fb846d52c61 *NEWS.md
 91262d6c474518679e58e839049a34e4 *R/aaa.R
-018b58df45fbab8a932be2b315757f60 *R/general.R
-0e32cc5ff83aa83fcb91482839d5ac3a *R/maraca.R
+262f4402adeec512d9ace7fa593ed6ae *R/general.R
+84de4ead0e2fae31fb710ab3a28d6f25 *R/maraca.R
 ae193931177b3d2eed76449e254f6846 *build/vignette.rds
 6b6364c02e752a8899738c165261728d *data/hce_scenario_a.rda
 44a003384c9acfb501073c07affbc59c *data/hce_scenario_b.rda
@@ -12,10 +12,10 @@ f0b1a6795eaea6b0828a200780bc1964 *data/hce_scenario_d.rda
 132d3b6d8f9a07e6e20995fbb80f7370 *data/hce_scenario_kccq3.rda
 ac52668b24364e027313447b40df9e41 *inst/doc/faq.R
 9f5c10cecc376e6aae119f1c087bbf7b *inst/doc/faq.Rmd
-b6b0fc31709b746717a005415c23a53c *inst/doc/faq.html
+5cbe751158af33ea31216480e460df6e *inst/doc/faq.html
 3c4fbbcdf33a0526e80c3e9de341c2c0 *inst/doc/maraca.R
 781e20bddbbdec3c6e2ad7a03f569b49 *inst/doc/maraca.Rmd
-a433afd234b3b8d59d98c2d8bc2bd6ed *inst/doc/maraca.html
+4606904f262f5cf5501bd96e43fe48e5 *inst/doc/maraca.html
 7018c22238a52c79f849988bfccff4ac *inst/extdata/hce_scenario_a.csv
 b7a7771b2a813812591f7d3c59145166 *inst/extdata/hce_scenario_b.csv
 4330cc27a6efabf4339d47a26c099efc *inst/extdata/hce_scenario_c.csv
@@ -26,7 +26,7 @@ fa2cb0bf03ada4019ee48a8c2a0e0470 *man/hce_scenario_b.Rd
 e19d1c9b27fc103af3dce79e2fd5f7d8 *man/hce_scenario_c.Rd
 3655eeb7dac737ee46af1236061928c2 *man/hce_scenario_d.Rd
 99eb5d84f79951d363754ccd355ba0a4 *man/hce_scenario_kccq3.Rd
-325191f0b0f9c262f272707b22fe4812 *man/maraca.Rd
+041a6356253d8311617874e2270e8040 *man/maraca.Rd
 eca42c3dc224b2bed769c4df3ecded1d *man/plot.hce.Rd
 b9fb3e0279a3d27e77e5b704302f98b4 *man/plot.maraca.Rd
 12da1edb5ede940208314738dd8ae5f7 *man/plot_maraca.Rd
