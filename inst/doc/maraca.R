@@ -56,6 +56,6 @@ plot(mar, continuous_grid_spacing_x = 20, density_plot_type = "scatter", vline_t
 ## ----maraca11, eval = TRUE, fig.width = 7, fig.height = 6, message=FALSE, warning=FALSE----
 p <- plot_maraca(mar, continuous_grid_spacing_x = 20, density_plot_type = "scatter", vline_type = "mean")
 p + 
-  theme_bw() + scale_color_manual(values=c("#999999", "#E69F00")) + 
+  scale_color_manual(values = c("#E69F00", "#999999")) + 
   theme(axis.text.x.bottom = element_text(vjust = 0.5, hjust = 0.5))
 
