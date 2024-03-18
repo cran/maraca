@@ -12,8 +12,8 @@ data(hce_scenario_a)
 ## -----------------------------------------------------------------------------
 maraca_dat <- maraca(
   data = hce_scenario_a,
-  tte_outcomes = c("Outcome I", "Outcome II", "Outcome III", "Outcome IV"),
-  continuous_outcome = "Continuous outcome",
+  step_outcomes = c("Outcome I", "Outcome II", "Outcome III", "Outcome IV"),
+  last_outcome = "Continuous outcome",
   fixed_followup_days = 3 * 365,
   column_names = c(outcome = "GROUP", arm = "TRTP", value = "AVAL0"),
   arm_levels = c(active = "Active", control = "Control"),
@@ -36,15 +36,50 @@ hce_dat <- simHCE(n = 2500, TTE_A = Rates_A, TTE_P = Rates_P,
 
 component_plot(hce_dat)
 
+## -----------------------------------------------------------------------------
+maraca_dat <- maraca(
+  data = hce_scenario_a,
+  step_outcomes = c("Outcome I", "Outcome II", "Outcome III", "Outcome IV"),
+  last_outcome = "Continuous outcome",
+  fixed_followup_days = 3 * 365,
+  column_names = c(outcome = "GROUP", arm = "TRTP", value = "AVAL0"),
+  arm_levels = c(active = "Active", control = "Control"),
+  # Make sure to calculate the win odds
+  compute_win_odds = TRUE
+)
+
+## ----fig.width=7, fig.height=6------------------------------------------------
+cumulative_plot(maraca_dat)
+
+## ----fig.width=7, fig.height=6------------------------------------------------
+cumulative_plot(hce_dat)
+
+## ----fig.width=7, fig.height=6------------------------------------------------
+cumulative_plot(maraca_dat, include = "win odds")
+
+## ----fig.width=7, fig.height=6------------------------------------------------
+cumulative_plot(hce_dat, reverse = TRUE)
+
+## ----fig.width=7, fig.height=6------------------------------------------------
+component_plot(maraca_dat) +
+  ggplot2::scale_fill_manual(values = c("seagreen", "red", "grey"), name = NULL)
+
+## ----fig.width=7, fig.height=6------------------------------------------------
+p <- cumulative_plot(maraca_dat)
+# Accessing the first ggplot2 object and adding styling (bar plot)
+p[[1]] <- p[[1]] +
+  ggplot2::scale_fill_manual(values = c("seagreen", "red", "grey"), name = NULL)
+p
+
 ## ----fig.width=7, fig.height=6------------------------------------------------
 component_plot(maraca_dat, theme = "maraca")
 
 ## ----fig.width=7, fig.height=6------------------------------------------------
-component_plot(maraca_dat, theme = "color1")
+cumulative_plot(maraca_dat, theme = "color1")
 
 ## ----fig.width=7, fig.height=6------------------------------------------------
 component_plot(maraca_dat, theme = "color2")
 
 ## ----fig.width=8, fig.height=6------------------------------------------------
-component_plot(maraca_dat, theme = "none")
+cumulative_plot(maraca_dat, theme = "none")
 

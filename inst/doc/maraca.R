@@ -23,10 +23,10 @@ column_names <- c(
 unique(data[["GROUP"]])
 
 ## ----maraca4, eval = TRUE-----------------------------------------------------
-tte_outcomes <- c(
+step_outcomes <- c(
   "Outcome I", "Outcome II", "Outcome III", "Outcome IV"
 )
-continuous_outcome <- "Continuous outcome"
+last_outcome <- "Continuous outcome"
 
 ## ----maraca5, eval = TRUE-----------------------------------------------------
 unique(data[["TRTP"]])
@@ -36,7 +36,7 @@ arm_levels = c(active = "Active", control = "Control")
 
 ## ----maraca7, eval = TRUE-----------------------------------------------------
 mar <- maraca(
-  data, tte_outcomes, continuous_outcome, arm_levels, column_names, 
+  data, step_outcomes, last_outcome, arm_levels, column_names, 
   fixed_followup_days = 3*365,
   compute_win_odds = TRUE
 )
@@ -58,4 +58,13 @@ p <- plot_maraca(mar, continuous_grid_spacing_x = 20, density_plot_type = "scatt
 p + 
   scale_color_manual(values = c("#E69F00", "#999999")) + 
   theme(axis.text.x.bottom = element_text(vjust = 0.5, hjust = 0.5))
+
+## ----fig.width = 7, fig.height = 6--------------------------------------------
+Rates_A <- c(1.72, 1.74, 0.58, 1.5, 1)
+Rates_P <- c(2.47, 2.24, 2.9, 4, 6)
+hce_dat <- hce::simHCE(n = 2500, TTE_A = Rates_A, TTE_P = Rates_P,
+              CM_A = -6, CM_P = 3, CSD_A = 15, CSD_P = 16, fixedfy = 3,
+              seed = 31337)
+plot(hce_dat, compute_win_odds = TRUE, lowerBetter = TRUE,
+     trans = "reverse")
 
