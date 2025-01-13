@@ -1,3 +1,7 @@
+# maraca 0.7.1
+
+Updated author information.
+
 # maraca 0.7
 
 ## New features
