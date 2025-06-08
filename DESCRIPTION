@@ -1,5 +1,5 @@
 Package: maraca
-Version: 0.7.1
+Version: 1.0.0
 Type: Package
 Title: The Maraca Plot: Visualizing Hierarchical Composite Endpoints
 License: Apache License (>= 2)
@@ -28,16 +28,17 @@ LazyData: true
 Depends: R (>= 3.5), hce (>= 0.5), ggplot2 (>= 3.3)
 Imports: dplyr (>= 1.0), tidyr (>= 1.2), checkmate (>= 2.1),
         patchwork(>= 1.0.0), lifecycle
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Suggests: knitr (>= 1.39), here (>= 1.0.1), lintr (>= 3.0.0), withr (>=
         2.5.0), testthat (>= 3.1), rmarkdown
 NeedsCompilation: no
 VignetteBuilder: knitr
-Packaged: 2025-01-13 13:12:55 UTC; hidden
-Author: Martin Karpefors [aut] (<https://orcid.org/0000-0003-3136-9882>),
-  Samvel B. Gasparyan [aut] (<https://orcid.org/0000-0002-4797-2208>),
+Packaged: 2025-06-08 21:55:36 UTC; hidden
+Author: Martin Karpefors [aut] (ORCID: <https://orcid.org/0000-0003-3136-9882>),
+  Samvel B. Gasparyan [aut] (ORCID:
+    <https://orcid.org/0000-0002-4797-2208>),
   Stefano Borini [ctb],
-  Monika Huhn [aut, cre] (<https://orcid.org/0009-0000-7865-6008>)
+  Monika Huhn [aut, cre] (ORCID: <https://orcid.org/0009-0000-7865-6008>)
 Maintainer: Monika Huhn <monika.huhn@astrazeneca.com>
 Repository: CRAN
-Date/Publication: 2025-01-13 14:10:09 UTC
+Date/Publication: 2025-06-08 22:30:02 UTC
